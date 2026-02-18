@@ -1,0 +1,12 @@
+frontend/
+.git/
+.gitignore
+*.md
+__pycache__/
+*.pyc
+.pytest_cache/
+.env_perplexity
+test_*.py
+.venv/
+venv/
+.cursor/
