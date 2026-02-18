@@ -8,7 +8,6 @@ langchain-community>=0.3.0
 langgraph>=0.2.0
 python-dotenv==1.0.0
 pyyaml>=6.0
-perplexity>=1.0.0
 yfinance>=0.2.0
 duckduckgo-search>=5.0.0
 
