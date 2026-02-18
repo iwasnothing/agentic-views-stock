@@ -1,0 +1,70 @@
+from pydantic import BaseModel, Field
+from typing import List, Literal
+
+
+class DecisionRequest(BaseModel):
+    user_message: str
+
+
+class PlannerOutput(BaseModel):
+    """Structured output from the planner: extracted intent and ticker."""
+    intent: str = Field(description="The user's intent, e.g. 'stock_analysis', 'comparison', 'general_question'")
+    ticker: str = Field(description="The stock ticker symbol extracted from the user message, e.g. 'AAPL', 'MSFT'")
+    reasoning: str = Field(description="Brief reasoning about how the intent and ticker were identified")
+
+
+class PersonaPerspective(BaseModel):
+    """Perspective axes for a persona"""
+    risk_appetite: Literal["low", "high", "moderate"] = Field(
+        description="Risk appetite level: low (risk-averse), high (risk-seeking), or moderate"
+    )
+    incentive_accountability: str = Field(
+        description="Description of incentive structure, accountability, and responsibility orientation"
+    )
+    time_horizon: Literal["short-term", "long-term", "reversible", "irreversible"] = Field(
+        description="Time horizon preference: short-term focus, long-term focus, or reversibility consideration"
+    )
+    value_orientation: List[Literal["efficiency", "fairness", "innovation", "security", "stability"]] = Field(
+        description="Primary value orientations from: efficiency, fairness, innovation, security, stability"
+    )
+    logical_reasoning_style: str = Field(
+        description="Description of logical reasoning approach and methodology"
+    )
+
+
+class Persona(BaseModel):
+    """A persona representing a specific analytical perspective"""
+    name: str = Field(description="Name or title of the persona")
+    description: str = Field(description="Brief description of the persona's role and perspective")
+    perspective: PersonaPerspective = Field(description="The perspective axes for this persona")
+    analysis_approach: str = Field(description="How this persona would approach analyzing the question")
+
+
+class PersonaCollection(BaseModel):
+    """Collection of 4 personas for multi-perspective analysis"""
+    personas: List[Persona] = Field(
+        min_length=4,
+        max_length=4,
+        description="List of exactly 4 personas, each with distinct perspectives"
+    )
+
+
+class ExecutiveSummary(BaseModel):
+    """Executive summary with profit outlook, risk assessment, and overall view."""
+    profit_outlook: str = Field(description="View on the company's future profitability including revenue growth trajectory, margin trends, and earnings power")
+    risk_assessment: str = Field(description="Key risks including competitive threats, macro risks, execution risks, and valuation risks")
+    overall_view: str = Field(description="Overall investment stance — bullish, bearish, or neutral — and why")
+
+
+class PersonaAnalysis(BaseModel):
+    """Analysis result from a single persona."""
+    persona_name: str = Field(description="Name of the persona that produced this analysis")
+    executive_summary: ExecutiveSummary = Field(description="Executive summary of how the company makes money, its economic quality, edge, and risks")
+    business_model: str = Field(description="Description of the business model")
+    what_they_sell_and_who_buys: str = Field(description="Main products/services, target customers, and why they buy")
+    how_they_make_money: str = Field(description="Revenue model, pricing logic, and key revenue segments")
+    revenue_quality: str = Field(description="Predictability and diversification of revenues, recurring vs one-off, concentration, and cycle exposure")
+    cost_structure: str = Field(description="Major cost drivers, gross/operating margins, and scalability")
+    capital_intensity: str = Field(description="Assets needed to run/grow operations, capex, working capital, and cash conversion efficiency")
+    growth_drivers: str = Field(description="Main levers for revenue growth — structural or cyclical")
+    competitive_edge: str = Field(description="What protects the company's economics from competition and how durable the moat is")
