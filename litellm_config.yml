@@ -1,15 +1,25 @@
-# LiteLLM Proxy configuration
-# Docs: https://docs.litellm.ai/docs/proxy/configs
-#
-# The backend connects to this proxy via OPENAI_BASE_URL=http://litellm:4000/v1
-
 model_list:
-  - model_name: Qwen3-30B-A3B-Instruct-FP8
+  - model_name: qwen-30b
     litellm_params:
-      model: openai/models/Qwen/Qwen3-30B-A3B-Instruct-FP8
-      api_base: http://spark-e773.local:8000/v1
-      api_key: no_key
+      model: openai//models/Qwen/Qwen3-30B-A3B-Instruct-FP8
+      api_base: http://172.26.0.1:8000/v1
+      api_key: sk-dummy-token
+
+  - model_name: /qwen-30b
+    litellm_params:
+      model: openai//models/Qwen/Qwen3-30B-A3B-Instruct-FP8
+      api_base: http://172.26.0.1:8000/v1
+      api_key: sk-dummy-token
+
+  - model_name: /models/Qwen/Qwen3-30B-A3B-Instruct-FP8
+    litellm_params:
+      model: openai//models/Qwen/Qwen3-30B-A3B-Instruct-FP8
+      api_base: http://172.26.0.1:8000/v1
+      api_key: sk-dummy-token
 
 litellm_settings:
   drop_params: true
-  set_verbose: false
+
+general_settings:
+  master_key: sk-1234
+  set_verbose: true

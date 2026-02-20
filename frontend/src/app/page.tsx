@@ -9,7 +9,12 @@ import type { ThinkingStep, ReportData, PersonaAnalysisData } from '@/types/repo
 
 type AppPhase = 'idle' | 'analyzing' | 'done' | 'error';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// Get API URL dynamically based on the hostname the user is accessing
+const getApiUrl = (): string => {
+  if (typeof window === 'undefined') return 'http://localhost:8001';
+  const { protocol, hostname } = window.location;
+  return process.env.NEXT_PUBLIC_API_URL || `${protocol}//${hostname}:8001`;
+};
 
 export default function Home() {
   const [phase, setPhase] = useState<AppPhase>('idle');
@@ -41,7 +46,7 @@ export default function Home() {
     };
 
     try {
-      const response = await fetch(`${API_URL}/api/analyze/stream`, {
+      const response = await fetch(`${getApiUrl()}/api/analyze/stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_message: `Analyze ${ticker} stock` }),

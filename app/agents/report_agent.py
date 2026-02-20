@@ -9,7 +9,7 @@ from app.events import emit_status, strip_tool_calls, strip_citation_markers
 logger = logging.getLogger(__name__)
 
 
-REPORT_SYSTEM_PROMPT = """You are a senior investment report writer. Your job is to synthesize multiple analyst perspectives and financial data into a single, well-structured investment report under 500 words.
+REPORT_SYSTEM_PROMPT = """You are a senior investment report writer. Your job is to synthesize multiple analyst perspectives and financial data into a single, well-structured investment report under 300 words.
 
 You MUST output the report in valid Markdown format. Use proper Markdown headings, bold text, bullet lists, horizontal rules, and blockquotes for structure and readability.
 
@@ -45,15 +45,7 @@ def _format_persona_analyses(analyses: list[PersonaAnalysis]) -> str:
             f"### Analyst {i}: {a.persona_name}\n"
             f"**Profit Outlook:** {a.executive_summary.profit_outlook}\n\n"
             f"**Risk Assessment:** {a.executive_summary.risk_assessment}\n\n"
-            f"**Overall View:** {a.executive_summary.overall_view}\n\n"
-            f"**Business Model:** {a.business_model}\n\n"
-            f"**What They Sell and Who Buys:** {a.what_they_sell_and_who_buys}\n\n"
-            f"**How They Make Money:** {a.how_they_make_money}\n\n"
-            f"**Revenue Quality:** {a.revenue_quality}\n\n"
-            f"**Cost Structure:** {a.cost_structure}\n\n"
-            f"**Capital Intensity:** {a.capital_intensity}\n\n"
-            f"**Growth Drivers:** {a.growth_drivers}\n\n"
-            f"**Competitive Edge:** {a.competitive_edge}"
+            f"**Overall View:** {a.executive_summary.overall_view}"
         )
     return "\n\n---\n\n".join(sections)
 
@@ -78,6 +70,8 @@ async def report_node(state: AgentState) -> AgentState:
     llm = create_llm()
 
     user_content = f"""Generate a comprehensive investment report for {ticker}.
+
+IMPORTANT: The entire report must be under 300 words.
 
 --- PERSONA ANALYSES ---
 {formatted_analyses}

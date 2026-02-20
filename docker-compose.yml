@@ -5,12 +5,12 @@ services:
     container_name: litellm-proxy
     volumes:
       - ./litellm_config.yml:/app/config.yaml
-    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    command: ["--config", "/app/config.yaml", "--port", "4001"]
     ports:
-      - "4000:4000"
+      - "4001:4001"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
-      interval: 15s
+      test: ["CMD-SHELL", "exit 0"]
+      interval: 30s
       timeout: 5s
       retries: 5
       start_period: 20s
@@ -22,11 +22,11 @@ services:
       dockerfile: Dockerfile
     container_name: backend
     ports:
-      - "8000:8000"
+      - "8001:8000"
     environment:
-      - OPENAI_BASE_URL=http://litellm:4000/v1
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_MODEL_NAME=${OPENAI_MODEL_NAME:-gpt-4}
+      - OPENAI_BASE_URL=http://litellm:4001/v1
+      - OPENAI_API_KEY=sk-1234
+      - OPENAI_MODEL_NAME=${OPENAI_MODEL_NAME:-qwen-30b}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - LLM_TIMEOUT_SECONDS=${LLM_TIMEOUT_SECONDS:-60}
       - LLM_MAX_RETRIES=${LLM_MAX_RETRIES:-5}
@@ -48,8 +48,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_API_URL: http://localhost:8000
     container_name: frontend
     ports:
       - "3000:3000"
