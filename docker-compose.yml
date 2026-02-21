@@ -2,7 +2,7 @@ services:
   # ── LiteLLM Proxy (OpenAI-compatible gateway) ─────────────────────────────
   litellm:
     image: ghcr.io/berriai/litellm:main-latest
-    container_name: litellm-proxy
+    container_name: agentic-litellm-proxy
     volumes:
       - ./litellm_config.yml:/app/config.yaml
     command: ["--config", "/app/config.yaml", "--port", "4001"]
@@ -50,7 +50,7 @@ services:
       dockerfile: Dockerfile
     container_name: frontend
     ports:
-      - "3000:3000"
+      - "3001:3000"
     depends_on:
       backend:
         condition: service_healthy
