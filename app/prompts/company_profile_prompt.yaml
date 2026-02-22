@@ -1,0 +1,44 @@
+company_profile_prompt: |
+  ### Task: Base on the personal in the system prompt, analyze {ticker} using the framework below.
+  ### Context:
+  Only Use the following verifiable, factual information to analyze the company:
+  {financial_info}
+
+  ### Tone: Be concise, analytical, and concrete — no filler or marketing language.
+  ### Constraints: under 1000 words.
+  ### Framework:
+  - business_model: Business Model
+  Describe the business model in 100 words.
+  - what_they_sell_and_who_buys: What They Sell and Who Buys
+  Describe the main products or services.
+  Define target customers (type, segment, geography) and why they buy — main pain point or motivation.
+  - how_they_make_money: How They Make Money
+  Explain the revenue model and pricing logic.
+  Clarify whether it's one-time, recurring, transaction-based, or hybrid.
+  Include key revenue segments and their share if available.
+  - revenue_quality: Revenue Quality
+  Assess how predictable and diversified revenues are.
+  Break down recurring vs one-off components, customer or segment concentration, and exposure to cycles.
+  - cost_structure: Cost Structure
+  Outline major cost drivers (COGS, labor, logistics, marketing, etc.).
+  Include gross and operating margins where possible.
+  Comment on scalability — fixed vs variable costs and how margins move with growth.
+  - capital_intensity: Capital Intensity
+  Describe assets needed to run and grow operations.
+  Include capital expenditures, working-capital needs, and cash conversion efficiency.
+  - growth_drivers: Growth Drivers
+  Identify the main levers for revenue growth — volume, pricing, product mix, geographic expansion, or acquisitions.
+  Clarify if these are structural (long-term) or cyclical (short-term).
+  - competitive_edge: Competitive Edge
+  Explain what protects the company's economics from competition: brand, cost advantage, switching cost, regulation, network effects, data, or IP.
+  Mention how durable and testable this moat appears based on financial evidence (margins, ROIC, retention).
+
+  ### Output format (JSON) with the following keys:
+  - business_model: Business Model
+  - what_they_sell_and_who_buys: What They Sell and Who Buys
+  - how_they_make_money: How They Make Money
+  - revenue_quality: Revenue Quality
+  - cost_structure: Cost Structure
+  - capital_intensity: Capital Intensity
+  - growth_drivers: Growth Drivers
+  - competitive_edge: Competitive Edge

@@ -1,0 +1,22 @@
+persona_analysis_prompt: |
+  ### Task: Base on the personal in the system prompt, analyze {ticker} using the framework below.
+  ### Context:
+  Only Use the following verifiable, factual information to analyze the company:
+  {financial_info}
+  {company_profile}
+
+  ### Tone: Be concise, analytical, and concrete — no filler or marketing language.
+  ### Constraints: under 1000 words.
+  ### Framework:
+  - executive_summary: Executive Summary
+  Summarize in plain English how this company makes money, its economic quality, and where its edge and risks lie.
+  It needs to include the following:
+  1. **Profit Outlook**: What is your view on the company's future profitability? Consider revenue growth trajectory, margin trends, and earnings power.
+  2. **Risk Assessment**: What are the key risks from your perspective? Consider competitive threats, macro risks, execution risks, and valuation risks.
+  3. **Overall View**: Given your analytical framework, what is your overall investment stance? Bullish, bearish, or neutral — and why?
+
+  ### Output format (JSON) with the following keys:
+  - executive_summary: Executive Summary
+    - profit_outlook: Profit Outlook
+    - risk_assessment: Risk Assessment
+    - overall_view: Overall View
