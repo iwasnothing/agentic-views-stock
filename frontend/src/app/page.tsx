@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import SearchBar from '@/components/SearchBar';
 import ThinkingProcess from '@/components/ThinkingProcess';
 import ReportDashboard from '@/components/ReportDashboard';
@@ -9,15 +9,28 @@ import type { ThinkingStep, ReportData, PersonaAnalysisData } from '@/types/repo
 
 type AppPhase = 'idle' | 'analyzing' | 'done' | 'error';
 
-// Get API URL dynamically based on the hostname the user is accessing
-const getApiUrl = (): string => {
+function getDefaultApiUrl(): string {
   if (typeof window === 'undefined') return 'http://localhost:8001';
   const { protocol, hostname } = window.location;
-  return process.env.NEXT_PUBLIC_API_URL || `${protocol}//${hostname}:8001`;
-};
+  return `${protocol}//${hostname}:8001`;
+}
 
 export default function Home() {
   const [phase, setPhase] = useState<AppPhase>('idle');
+  const runtimeApiUrl = useRef<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/config')
+      .then((res) => res.json())
+      .then((data: { apiUrl?: string }) => {
+        if (data.apiUrl) runtimeApiUrl.current = data.apiUrl;
+      })
+      .catch(() => {});
+  }, []);
+
+  const getApiUrl = useCallback((): string => {
+    return runtimeApiUrl.current || getDefaultApiUrl();
+  }, []);
   const [steps, setSteps] = useState<ThinkingStep[]>([]);
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [error, setError] = useState<string | null>(null);
