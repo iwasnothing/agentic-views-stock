@@ -1,13 +1,13 @@
 from typing import List
 from typing_extensions import TypedDict
 
-from app.schema.models import Persona, PersonaAnalysis
+from app.schema.models import Persona, PersonaAnalysis, CompanyProfile
 
 
 class AgentState(TypedDict, total=False):
     """Shared state for the LangGraph stock-analysis workflow.
 
-    Flow: planner -> stock_info -> persona_generator -> analysis (loop) -> report
+    Flow: planner -> stock_info -> financial_reporter -> persona_generator -> analysis (loop) -> report
     """
 
     # Input
@@ -20,6 +20,9 @@ class AgentState(TypedDict, total=False):
 
     # Stock info agent output
     financial_info: str
+
+    # Financial reporter output
+    company_profile: CompanyProfile
 
     # Persona generator output
     personas: List[Persona]

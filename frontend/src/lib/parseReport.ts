@@ -5,6 +5,7 @@ import type {
   AnalystCard,
   FinancialMetrics,
   PersonaAnalysisData,
+  CompanyProfile,
 } from '@/types/report';
 
 const ANALYST_ICONS = ['📊', '🔍', '🌐', '📈'];
@@ -67,6 +68,49 @@ function extractExecutiveSummary(report: string): { summary: string; takeaways: 
   };
 }
 
+function extractCompanyProfile(report: string): CompanyProfile {
+  const section = report.match(
+    /##\s*3\.\s*Company Profile\s*\n([\s\S]*?)(?=\n##\s|\n$)/i,
+  );
+
+  const defaults: CompanyProfile = {
+    business_model: '',
+    what_they_sell_and_who_buys: '',
+    how_they_make_money: '',
+    revenue_quality: '',
+    cost_structure: '',
+    capital_intensity: '',
+    growth_drivers: '',
+    competitive_edge: '',
+  };
+
+  if (!section) return defaults;
+
+  const text = section[1].trim();
+  const profile: CompanyProfile = { ...defaults };
+
+  // Extract each section - capture everything up to the next bold heading
+  const sections = [
+    { key: 'business_model' as const, pattern: /\*\*Business Model\*\*:\s*([\s\S]*?)(?=\n\*\*)/i },
+    { key: 'what_they_sell_and_who_buys' as const, pattern: /\*\*Products & Customers\*\*:\s*([\s\S]*?)(?=\n\*\*)/i },
+    { key: 'how_they_make_money' as const, pattern: /\*\*Revenue Model\*\*:\s*([\s\S]*?)(?=\n\*\*)/i },
+    { key: 'revenue_quality' as const, pattern: /\*\*Revenue Quality\*\*:\s*([\s\S]*?)(?=\n\*\*)/i },
+    { key: 'cost_structure' as const, pattern: /\*\*Cost Structure\*\*:\s*([\s\S]*?)(?=\n\*\*)/i },
+    { key: 'capital_intensity' as const, pattern: /\*\*Capital Intensity\*\*:\s*([\s\S]*?)(?=\n\*\*)/i },
+    { key: 'growth_drivers' as const, pattern: /\*\*Growth Drivers\*\*:\s*([\s\S]*?)(?=\n\*\*)/i },
+    { key: 'competitive_edge' as const, pattern: /\*\*Competitive Edge\*\*:\s*([\s\S]*?)(?=\n\*\*|\n$)/i },
+  ];
+
+  for (const { key, pattern } of sections) {
+    const match = text.match(pattern);
+    if (match) {
+      profile[key] = match[1].trim();
+    }
+  }
+
+  return profile;
+}
+
 function determineSentiment(overallView: string): Sentiment {
   const lower = overallView.toLowerCase();
   if (/\bbullish\b/.test(lower) || /\bbuy\b/.test(lower) || /\boptimistic\b/.test(lower)) {
@@ -97,14 +141,6 @@ function buildAnalystCards(personaAnalyses: PersonaAnalysisData[]): AnalystCard[
       profitOutlook: pa.executive_summary.profit_outlook,
       riskAssessment: pa.executive_summary.risk_assessment,
       overallView: pa.executive_summary.overall_view,
-      businessModel: pa.business_model,
-      whatTheySellAndWhoBuys: pa.what_they_sell_and_who_buys,
-      howTheyMakeMoney: pa.how_they_make_money,
-      revenueQuality: pa.revenue_quality,
-      costStructure: pa.cost_structure,
-      capitalIntensity: pa.capital_intensity,
-      growthDrivers: pa.growth_drivers,
-      competitiveEdge: pa.competitive_edge,
     };
   });
 }
@@ -166,9 +202,7 @@ function findAgreements(analysts: AnalystCard[]): string[] {
   if (sentiments.size === 1) {
     agreements.push(`All analysts share a ${analysts[0].sentiment} outlook`);
   }
-  const allMentionGrowth = analysts.every(
-    (a) => /growth/i.test(a.profitOutlook) || /growth/i.test(a.growthDrivers),
-  );
+  const allMentionGrowth = analysts.every((a) => /growth/i.test(a.profitOutlook));
   if (allMentionGrowth) {
     agreements.push('All analysts identify growth as a key factor');
   }
@@ -204,6 +238,7 @@ export function parseReport(
   const recommendation = extractRecommendation(report);
   const recommendationText = extractRecommendationText(report);
   const { summary, takeaways } = extractExecutiveSummary(report);
+  const companyProfile = extractCompanyProfile(report);
   const analysts = buildAnalystCards(personaAnalyses);
   const metrics = extractMetrics(financialInfo);
   const consensusScore = computeConsensus(analysts);
@@ -216,6 +251,7 @@ export function parseReport(
     recommendationText,
     executiveSummary: summary,
     keyTakeaways: takeaways,
+    companyProfile,
     agreements,
     disagreements,
     analysts,

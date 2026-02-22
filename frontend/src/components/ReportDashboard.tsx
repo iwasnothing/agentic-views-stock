@@ -1,8 +1,10 @@
 'use client';
 
 import type { ReportData } from '@/types/report';
+import ReactMarkdown from 'react-markdown';
 import TickerHead from './TickerHead';
 import MetricRail from './MetricRail';
+import CompanyProfile from './CompanyProfile';
 import AnalystMatrix from './AnalystMatrix';
 import SynthesisFooter from './SynthesisFooter';
 
@@ -48,7 +50,9 @@ export default function ReportDashboard({ data }: ReportDashboardProps) {
                     {data.keyTakeaways.map((t, i) => (
                       <li key={i} className="flex items-start gap-2">
                         <span className="text-blue-400/60 mt-0.5 shrink-0">›</span>
-                        <span className="text-xs text-foreground/70 leading-relaxed">{t}</span>
+                        <span className="text-xs text-foreground/70 leading-relaxed">
+                          <ReactMarkdown>{t}</ReactMarkdown>
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -56,6 +60,9 @@ export default function ReportDashboard({ data }: ReportDashboardProps) {
               )}
             </div>
           )}
+
+          {/* Company Profile */}
+          <CompanyProfile profile={data.companyProfile} />
 
           {/* Analyst Matrix */}
           <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-3 px-1">

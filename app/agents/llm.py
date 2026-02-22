@@ -9,15 +9,21 @@ from app.config import LLM_TIMEOUT, LLM_MAX_RETRIES
 logger = logging.getLogger(__name__)
 
 
-def create_llm(temperature: float = 0.0, max_tokens: Optional[int] = None) -> ChatOpenAI:
+def create_llm(temperature: float = 0.0, max_tokens: Optional[int] = None, timeout: Optional[int] = None) -> ChatOpenAI:
     """Create a LangChain ChatOpenAI client with custom endpoint.
 
     Timeout and retry behaviour are controlled by the env vars
     ``LLM_TIMEOUT_SECONDS`` (default 60) and ``LLM_MAX_RETRIES`` (default 5).
+
+    Args:
+        temperature: Sampling temperature (default 0.0)
+        max_tokens: Maximum tokens to generate (default None)
+        timeout: Override timeout in seconds (default uses LLM_TIMEOUT from env)
     """
     base_url = os.getenv("OPENAI_BASE_URL")
     api_key = os.getenv("OPENAI_API_KEY")
     model_name = os.getenv("OPENAI_MODEL_NAME", "sonar")
+    actual_timeout = timeout if timeout is not None else LLM_TIMEOUT
 
     logger.info(
         "Env vars loaded: OPENAI_BASE_URL=%s, OPENAI_API_KEY=%s, OPENAI_MODEL_NAME=%s",
@@ -33,7 +39,7 @@ def create_llm(temperature: float = 0.0, max_tokens: Optional[int] = None) -> Ch
 
     logger.info(
         "Creating LLM: model=%s, base_url=%s, temperature=%s, timeout=%ds, max_retries=%d, max_tokens=%s",
-        model_name, base_url, temperature, LLM_TIMEOUT, LLM_MAX_RETRIES, max_tokens,
+        model_name, base_url, temperature, actual_timeout, LLM_MAX_RETRIES, max_tokens,
     )
 
     kwargs = dict(
@@ -41,7 +47,7 @@ def create_llm(temperature: float = 0.0, max_tokens: Optional[int] = None) -> Ch
         api_key=api_key,
         model=model_name,
         temperature=temperature,
-        timeout=LLM_TIMEOUT,
+        timeout=actual_timeout,
         max_retries=LLM_MAX_RETRIES,
     )
     if max_tokens is not None:

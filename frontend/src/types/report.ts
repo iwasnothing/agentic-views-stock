@@ -17,9 +17,7 @@ export interface ExecutiveSummaryData {
   overall_view: string;
 }
 
-export interface PersonaAnalysisData {
-  persona_name: string;
-  executive_summary: ExecutiveSummaryData;
+export interface CompanyProfile {
   business_model: string;
   what_they_sell_and_who_buys: string;
   how_they_make_money: string;
@@ -28,6 +26,11 @@ export interface PersonaAnalysisData {
   capital_intensity: string;
   growth_drivers: string;
   competitive_edge: string;
+}
+
+export interface PersonaAnalysisData {
+  persona_name: string;
+  executive_summary: ExecutiveSummaryData;
 }
 
 export interface FinancialMetrics {
@@ -53,14 +56,6 @@ export interface AnalystCard {
   profitOutlook: string;
   riskAssessment: string;
   overallView: string;
-  businessModel: string;
-  whatTheySellAndWhoBuys: string;
-  howTheyMakeMoney: string;
-  revenueQuality: string;
-  costStructure: string;
-  capitalIntensity: string;
-  growthDrivers: string;
-  competitiveEdge: string;
 }
 
 export interface ReportData {
@@ -71,6 +66,7 @@ export interface ReportData {
   keyTakeaways: string[];
   agreements: string[];
   disagreements: string[];
+  companyProfile: CompanyProfile;
   analysts: AnalystCard[];
   metrics: FinancialMetrics;
   financialInfo: string;

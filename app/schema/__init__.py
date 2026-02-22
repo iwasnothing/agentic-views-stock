@@ -4,6 +4,7 @@ from .models import (
     Persona,
     PersonaCollection,
     PlannerOutput,
+    CompanyProfile,
     ExecutiveSummary,
     PersonaAnalysis,
 )
@@ -15,6 +16,7 @@ __all__ = [
     "Persona",
     "PersonaCollection",
     "PlannerOutput",
+    "CompanyProfile",
     "ExecutiveSummary",
     "PersonaAnalysis",
     "AgentState",

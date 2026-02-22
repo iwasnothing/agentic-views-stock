@@ -1,8 +1,9 @@
 import logging
+import json
 
 from langchain_core.messages import SystemMessage, HumanMessage
 
-from app.schema import AgentState, PersonaAnalysis
+from app.schema import AgentState, PersonaAnalysis, CompanyProfile
 from app.agents.llm import create_llm
 from app.events import emit_status, strip_tool_calls, strip_citation_markers
 
@@ -23,7 +24,18 @@ Start with a clear recommendation in bold (e.g. **Buy**, **Hold**, **Sell**, or 
 ## 2. Executive Summary
 A concise overview (200-300 words) of the company's business model, financial health, growth trajectory, and the balance of upside vs. downside. Use bullet points for key takeaways. Highlight where analysts agree and where they diverge.
 
-## 3. Analyst Perspectives
+## 3. Company Profile
+Provide a structured overview of the company using the following sections:
+- **Business Model**: Brief description of how the company operates
+- **Products & Customers**: What they sell and who buys it
+- **Revenue Model**: How they make money
+- **Revenue Quality**: Predictability and diversification
+- **Cost Structure**: Major cost drivers and margins
+- **Capital Intensity**: Assets needed for operations
+- **Growth Drivers**: Main levers for growth
+- **Competitive Edge**: What protects their economics
+
+## 4. Analyst Perspectives
 For each analyst persona, use a ### sub-heading with the persona name, then provide:
 - **Profit Outlook:** their view on future profitability
 - **Risk Assessment:** their key risk concerns
@@ -31,10 +43,29 @@ For each analyst persona, use a ### sub-heading with the persona name, then prov
 
 Separate each persona section with a horizontal rule (---). Present each persona's analysis faithfully without editorializing.
 
-## 4. Appendix: Financial Information
+## 5. Appendix: Financial Information
 Include the full original financial data gathered at the beginning of the analysis, unmodified, as reference material. Format it in a readable Markdown blockquote or code block.
 
 Write in a professional, analytical tone. Be precise and reference specific data points. The entire output must be well-formatted Markdown ready to be saved as a .md file."""
+
+
+def _format_company_profile(company_profile: CompanyProfile) -> str:
+    """Format the company profile into a readable block for the LLM."""
+    return f"""**Business Model:** {company_profile.business_model}
+
+**Products & Customers:** {company_profile.what_they_sell_and_who_buys}
+
+**Revenue Model:** {company_profile.how_they_make_money}
+
+**Revenue Quality:** {company_profile.revenue_quality}
+
+**Cost Structure:** {company_profile.cost_structure}
+
+**Capital Intensity:** {company_profile.capital_intensity}
+
+**Growth Drivers:** {company_profile.growth_drivers}
+
+**Competitive Edge:** {company_profile.competitive_edge}"""
 
 
 def _format_persona_analyses(analyses: list[PersonaAnalysis]) -> str:
@@ -55,23 +86,32 @@ async def report_node(state: AgentState) -> AgentState:
     logger.info("=== REPORT NODE START ===")
     ticker = state["ticker"]
     financial_info = state["financial_info"]
+    company_profile = state["company_profile"]
     persona_analyses = state["persona_analyses"]
 
-    logger.info("Ticker: %s, financial_info: %d chars, %d persona analyses", ticker, len(financial_info), len(persona_analyses))
+    logger.info("Ticker: %s, financial_info: %d chars, company_profile: %d chars, %d persona analyses",
+                 ticker, len(financial_info), len(json.dumps(company_profile.model_dump())), len(persona_analyses))
 
     for i, a in enumerate(persona_analyses):
         logger.info("  Analysis %d: %s — profit=%d chars, risk=%d chars, view=%d chars",
                      i + 1, a.persona_name, len(a.executive_summary.profit_outlook),
                      len(a.executive_summary.risk_assessment), len(a.executive_summary.overall_view))
 
+    formatted_company_profile = _format_company_profile(company_profile)
     formatted_analyses = _format_persona_analyses(persona_analyses)
-    logger.debug("Formatted analyses: %d chars", len(formatted_analyses))
+    logger.debug("Formatted company profile: %d chars, formatted analyses: %d chars",
+                 len(formatted_company_profile), len(formatted_analyses))
 
-    llm = create_llm()
+    # Use higher timeout for report generation since prompt is larger (company profile + personas)
+    llm = create_llm(timeout=1800)
 
     user_content = f"""Generate a comprehensive investment report for {ticker}.
 
 IMPORTANT: The entire report must be under 300 words.
+
+--- COMPANY PROFILE ---
+{formatted_company_profile}
+--- END COMPANY PROFILE ---
 
 --- PERSONA ANALYSES ---
 {formatted_analyses}
@@ -84,7 +124,8 @@ IMPORTANT: The entire report must be under 300 words.
 Follow the required report structure exactly:
 1. Recommendation (with clear Buy/Hold/Sell/Avoid stance)
 2. Executive Summary
-3. Each persona's analysis (preserve their individual views)
+3. Company Profile
+4. Each persona's analysis (preserve their individual views)
 """
     messages = [
         SystemMessage(content=REPORT_SYSTEM_PROMPT),
@@ -105,4 +146,4 @@ Follow the required report structure exactly:
     logger.debug("Report preview: %s...", (report_content or "")[:500])
     logger.info("=== REPORT NODE END ===")
 
-    return {"report": report_content, "financial_info": financial_info, "persona_analyses": persona_analyses}
+    return {"report": report_content, "financial_info": financial_info, "company_profile": company_profile, "persona_analyses": persona_analyses}
