@@ -234,11 +234,12 @@ export function parseReport(
   report: string,
   financialInfo: string,
   personaAnalyses: PersonaAnalysisData[],
+  structuredCompanyProfile?: CompanyProfile | null,
 ): ReportData {
   const recommendation = extractRecommendation(report);
   const recommendationText = extractRecommendationText(report);
   const { summary, takeaways } = extractExecutiveSummary(report);
-  const companyProfile = extractCompanyProfile(report);
+  const companyProfile = structuredCompanyProfile ?? extractCompanyProfile(report);
   const analysts = buildAnalystCards(personaAnalyses);
   const metrics = extractMetrics(financialInfo);
   const consensusScore = computeConsensus(analysts);

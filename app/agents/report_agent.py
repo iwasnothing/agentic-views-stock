@@ -24,28 +24,6 @@ Start with a clear recommendation in bold (e.g. **Buy**, **Hold**, **Sell**, or 
 ## 2. Executive Summary
 A concise overview (200-300 words) of the company's business model, financial health, growth trajectory, and the balance of upside vs. downside. Use bullet points for key takeaways. Highlight where analysts agree and where they diverge.
 
-## 3. Company Profile
-Provide a structured overview of the company using the following sections:
-- **Business Model**: Brief description of how the company operates
-- **Products & Customers**: What they sell and who buys it
-- **Revenue Model**: How they make money
-- **Revenue Quality**: Predictability and diversification
-- **Cost Structure**: Major cost drivers and margins
-- **Capital Intensity**: Assets needed for operations
-- **Growth Drivers**: Main levers for growth
-- **Competitive Edge**: What protects their economics
-
-## 4. Analyst Perspectives
-For each analyst persona, use a ### sub-heading with the persona name, then provide:
-- **Profit Outlook:** their view on future profitability
-- **Risk Assessment:** their key risk concerns
-- **Overall View:** their investment stance and reasoning
-
-Separate each persona section with a horizontal rule (---). Present each persona's analysis faithfully without editorializing.
-
-## 5. Appendix: Financial Information
-Include the full original financial data gathered at the beginning of the analysis, unmodified, as reference material. Format it in a readable Markdown blockquote or code block.
-
 Write in a professional, analytical tone. Be precise and reference specific data points. The entire output must be well-formatted Markdown ready to be saved as a .md file."""
 
 

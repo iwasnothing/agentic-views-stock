@@ -18,6 +18,7 @@ router = APIRouter()
 NODE_LABELS = {
     "planner": "Understanding your request",
     "stock_info": "Gathering financial data",
+    "financial_reporter": "Building company profile",
     "generate_personas": "Creating analyst personas",
     "analysis": "Running multi-perspective analysis",
     "generate_report": "Writing final report",
@@ -41,6 +42,7 @@ async def analyze(request: DecisionRequest):
         "report": result.get("report", ""),
         "financial_info": result.get("financial_info", ""),
         "persona_analyses": result.get("persona_analyses", []),
+        "company_profile": result.get("company_profile", ""),
     }
 
 
@@ -60,6 +62,11 @@ def _serialize_update(node_name: str, update: dict) -> dict:
         fi = update.get("financial_info", "")
         event["message"] = f"Collected {len(fi)} chars of financial data"
         event["financial_info"] = fi
+    elif node_name == "financial_reporter":
+        cp = update.get("company_profile")
+        event["message"] = "Company profile generated"
+        if cp is not None:
+            event["company_profile"] = cp.model_dump() if hasattr(cp, "model_dump") else cp
     elif node_name == "generate_personas":
         personas = update.get("personas", [])
         event["message"] = f"Generated {len(personas)} analyst personas"

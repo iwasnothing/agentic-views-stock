@@ -5,7 +5,7 @@ import SearchBar from '@/components/SearchBar';
 import ThinkingProcess from '@/components/ThinkingProcess';
 import ReportDashboard from '@/components/ReportDashboard';
 import { parseReport } from '@/lib/parseReport';
-import type { ThinkingStep, ReportData, PersonaAnalysisData } from '@/types/report';
+import type { ThinkingStep, ReportData, PersonaAnalysisData, CompanyProfile } from '@/types/report';
 
 type AppPhase = 'idle' | 'analyzing' | 'done' | 'error';
 
@@ -30,6 +30,7 @@ export default function Home() {
     ticker: '',
     financialInfo: '',
     personaAnalyses: [] as PersonaAnalysisData[],
+    companyProfile: null as CompanyProfile | null,
     report: '',
   });
 
@@ -44,6 +45,7 @@ export default function Home() {
       ticker: '',
       financialInfo: '',
       personaAnalyses: [],
+      companyProfile: null,
       report: '',
     };
 
@@ -124,18 +126,22 @@ export default function Home() {
             if (data.ticker) streamState.current.ticker = data.ticker as string;
             if (data.financial_info)
               streamState.current.financialInfo = data.financial_info as string;
+            if (data.company_profile)
+              streamState.current.companyProfile =
+                data.company_profile as CompanyProfile;
             if (data.persona_analyses)
               streamState.current.personaAnalyses =
                 data.persona_analyses as PersonaAnalysisData[];
             if (data.report) streamState.current.report = data.report as string;
           } else if (data.type === 'complete') {
-            const { ticker: t, financialInfo, personaAnalyses, report } =
+            const { ticker: t, financialInfo, personaAnalyses, companyProfile, report } =
               streamState.current;
             const parsed = parseReport(
               t || ticker,
               report,
               financialInfo,
               personaAnalyses,
+              companyProfile,
             );
             setReportData(parsed);
             setPhase('done');
@@ -149,13 +155,14 @@ export default function Home() {
 
       // If we reached the end without a 'complete' event, try to build from whatever we have
       if (streamState.current.report && !reportData) {
-        const { ticker: t, financialInfo, personaAnalyses, report } =
+        const { ticker: t, financialInfo, personaAnalyses, companyProfile, report } =
           streamState.current;
         const parsed = parseReport(
           t || ticker,
           report,
           financialInfo,
           personaAnalyses,
+          companyProfile,
         );
         setReportData(parsed);
         setPhase('done');
