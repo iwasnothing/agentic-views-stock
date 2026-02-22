@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import SearchBar from '@/components/SearchBar';
 import ThinkingProcess from '@/components/ThinkingProcess';
 import ReportDashboard from '@/components/ReportDashboard';
@@ -9,28 +9,17 @@ import type { ThinkingStep, ReportData, PersonaAnalysisData } from '@/types/repo
 
 type AppPhase = 'idle' | 'analyzing' | 'done' | 'error';
 
-function getDefaultApiUrl(): string {
+function getApiUrl(): string {
   if (typeof window === 'undefined') return 'http://localhost:8001';
+  const cfg = (window as unknown as { __RUNTIME_CONFIG__?: { apiUrl?: string } })
+    .__RUNTIME_CONFIG__;
+  if (cfg?.apiUrl) return cfg.apiUrl;
   const { protocol, hostname } = window.location;
   return `${protocol}//${hostname}:8001`;
 }
 
 export default function Home() {
   const [phase, setPhase] = useState<AppPhase>('idle');
-  const runtimeApiUrl = useRef<string | null>(null);
-
-  useEffect(() => {
-    fetch('/api/config')
-      .then((res) => res.json())
-      .then((data: { apiUrl?: string }) => {
-        if (data.apiUrl) runtimeApiUrl.current = data.apiUrl;
-      })
-      .catch(() => {});
-  }, []);
-
-  const getApiUrl = useCallback((): string => {
-    return runtimeApiUrl.current || getDefaultApiUrl();
-  }, []);
   const [steps, setSteps] = useState<ThinkingStep[]>([]);
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [error, setError] = useState<string | null>(null);
