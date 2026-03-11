@@ -1,0 +1,16 @@
+dimension_cost_structure: |
+  ### Task: Analyze {ticker} and provide ONLY the "Cost Structure" section.
+  ### Context:
+  Only Use the following verifiable, factual information to analyze the company:
+  {financial_info}
+
+  ### Tone: Be concise, analytical, and concrete — no filler or marketing language.
+  ### Constraints: under 150 words.
+  ### Framework:
+  - cost_structure: Cost Structure
+  Outline major cost drivers (COGS, labor, logistics, marketing, etc.).
+  Include gross and operating margins where possible.
+  Comment on scalability — fixed vs variable costs and how margins move with growth.
+
+  ### Output format (JSON) with the following keys:
+  - cost_structure: Cost Structure (150 words max)

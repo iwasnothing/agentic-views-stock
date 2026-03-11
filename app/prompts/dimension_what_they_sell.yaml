@@ -1,0 +1,15 @@
+dimension_what_they_sell: |
+  ### Task: Analyze {ticker} and provide ONLY the "What They Sell and Who Buys" section.
+  ### Context:
+  Only Use the following verifiable, factual information to analyze the company:
+  {financial_info}
+
+  ### Tone: Be concise, analytical, and concrete — no filler or marketing language.
+  ### Constraints: under 150 words.
+  ### Framework:
+  - what_they_sell_and_who_buys: What They Sell and Who Buys
+  Describe the main products or services.
+  Define target customers (type, segment, geography) and why they buy — main pain point or motivation.
+
+  ### Output format (JSON) with the following keys:
+  - what_they_sell_and_who_buys: What They Sell and Who Buys (150 words max)

@@ -7,6 +7,15 @@ from .models import (
     CompanyProfile,
     ExecutiveSummary,
     PersonaAnalysis,
+    # Dimension models for split processing
+    BusinessModelOutput,
+    WhatTheySellOutput,
+    HowTheyMakeMoneyOutput,
+    RevenueQualityOutput,
+    CostStructureOutput,
+    CapitalIntensityOutput,
+    GrowthDriversOutput,
+    CompetitiveEdgeOutput,
 )
 from .state import AgentState
 
@@ -20,4 +29,13 @@ __all__ = [
     "ExecutiveSummary",
     "PersonaAnalysis",
     "AgentState",
+    # Dimension models
+    "BusinessModelOutput",
+    "WhatTheySellOutput",
+    "HowTheyMakeMoneyOutput",
+    "RevenueQualityOutput",
+    "CostStructureOutput",
+    "CapitalIntensityOutput",
+    "GrowthDriversOutput",
+    "CompetitiveEdgeOutput",
 ]

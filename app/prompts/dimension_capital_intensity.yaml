@@ -1,0 +1,15 @@
+dimension_capital_intensity: |
+  ### Task: Analyze {ticker} and provide ONLY the "Capital Intensity" section.
+  ### Context:
+  Only Use the following verifiable, factual information to analyze the company:
+  {financial_info}
+
+  ### Tone: Be concise, analytical, and concrete — no filler or marketing language.
+  ### Constraints: under 150 words.
+  ### Framework:
+  - capital_intensity: Capital Intensity
+  Describe assets needed to run and grow operations.
+  Include capital expenditures, working-capital needs, and cash conversion efficiency.
+
+  ### Output format (JSON) with the following keys:
+  - capital_intensity: Capital Intensity (150 words max)

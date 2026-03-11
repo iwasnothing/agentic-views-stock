@@ -1,0 +1,15 @@
+dimension_growth_drivers: |
+  ### Task: Analyze {ticker} and provide ONLY the "Growth Drivers" section.
+  ### Context:
+  Only Use the following verifiable, factual information to analyze the company:
+  {financial_info}
+
+  ### Tone: Be concise, analytical, and concrete — no filler or marketing language.
+  ### Constraints: under 150 words.
+  ### Framework:
+  - growth_drivers: Growth Drivers
+  Identify the main levers for revenue growth — volume, pricing, product mix, geographic expansion, or acquisitions.
+  Clarify if these are structural (long-term) or cyclical (short-term).
+
+  ### Output format (JSON) with the following keys:
+  - growth_drivers: Growth Drivers (150 words max)

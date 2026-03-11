@@ -1,0 +1,16 @@
+dimension_how_they_make_money: |
+  ### Task: Analyze {ticker} and provide ONLY the "How They Make Money" section.
+  ### Context:
+  Only Use the following verifiable, factual information to analyze the company:
+  {financial_info}
+
+  ### Tone: Be concise, analytical, and concrete — no filler or marketing language.
+  ### Constraints: under 150 words.
+  ### Framework:
+  - how_they_make_money: How They Make Money
+  Explain the revenue model and pricing logic.
+  Clarify whether it's one-time, recurring, transaction-based, or hybrid.
+  Include key revenue segments and their share if available.
+
+  ### Output format (JSON) with the following keys:
+  - how_they_make_money: How They Make Money (150 words max)

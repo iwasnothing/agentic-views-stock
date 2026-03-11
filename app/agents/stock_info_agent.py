@@ -3,6 +3,8 @@ import json
 import time
 import random
 import logging
+import asyncio
+from typing import List
 
 import yfinance as yf
 from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
@@ -83,6 +85,13 @@ def _search_ddg(query: str, max_results: int = 5) -> str:
             time.sleep(delay)
 
 
+async def _search_ddg_async(query: str, max_results: int = 5) -> tuple[str, str]:
+    """Run a DuckDuckGo search asynchronously by wrapping the sync function."""
+    # Run the blocking DDG search in a thread pool
+    result = await asyncio.to_thread(_search_ddg, query, max_results)
+    return query, result
+
+
 SEARCH_QUERIES = [
     "{ticker} business model revenue streams products and services",
     "{ticker} financial results revenue earnings margins latest quarterly annual",
@@ -105,7 +114,7 @@ async def stock_info_node(state: AgentState) -> AgentState:
     pass the combined data downstream for LLM synthesis.
 
     1. Fetch structured data from yfinance (income statement, balance sheet, etc.)
-    2. Run predefined DuckDuckGo searches for qualitative context
+    2. Run predefined DuckDuckGo searches for qualitative context (in parallel)
     3. Combine both into ``financial_info``
     """
     logger.info("=== STOCK INFO NODE START ===")
@@ -121,17 +130,33 @@ async def stock_info_node(state: AgentState) -> AgentState:
     })
     yf_data = _fetch_yfinance(ticker)
 
-    # Step 2: DuckDuckGo searches for qualitative context
-    all_search_results = []
+    # Step 2: DuckDuckGo searches for qualitative context (in parallel)
+    await emit_status({
+        "type": "status",
+        "node": "stock_info",
+        "label": f"Searching ({len(SEARCH_QUERIES)} queries)",
+        "message": f"Running {len(SEARCH_QUERIES)} parallel web searches…",
+    })
+
+    # Create all search tasks
+    search_tasks = []
     for idx, query_template in enumerate(SEARCH_QUERIES, 1):
         query = query_template.format(ticker=ticker)
+        task = _search_ddg_async(query)
+        search_tasks.append((idx, task))
+
+    # Run all searches in parallel
+    results = await asyncio.gather(*[task for _, task in search_tasks])
+
+    # Format results
+    all_search_results = []
+    for (idx, _), (query, result) in zip(search_tasks, results):
         await emit_status({
             "type": "status",
             "node": "stock_info",
-            "label": f"Searching ({idx}/{len(SEARCH_QUERIES)})",
+            "label": f"Search complete ({idx}/{len(SEARCH_QUERIES)})",
             "message": query[:80],
         })
-        result = _search_ddg(query)
         all_search_results.append(f"### Search: {query}\n{result}")
 
     ddg_data = "\n\n".join(all_search_results)

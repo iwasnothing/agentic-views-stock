@@ -1,7 +1,9 @@
 import logging
 import json
 import yaml
+import asyncio
 from pathlib import Path
+from typing import List
 
 from langchain_core.messages import SystemMessage, HumanMessage
 
@@ -49,7 +51,7 @@ async def _run_single_persona_analysis(
     """Run a single persona's analysis using a direct LLM call (no tools)."""
     logger.info("--- Analysis for persona: %s ---", persona.name)
 
-    llm = create_llm(max_tokens=16384)
+    llm = create_llm(max_tokens=10000)
     structured_llm = llm.with_structured_output(PersonaAnalysis)
 
     system_prompt = _build_persona_system_prompt(persona)
@@ -74,7 +76,7 @@ async def _run_single_persona_analysis(
 
 
 async def analysis_node(state: AgentState) -> AgentState:
-    """LangGraph node: run each persona's analysis sequentially."""
+    """LangGraph node: run each persona's analysis in parallel."""
     logger.info("=== ANALYSIS NODE START ===")
     personas = state["personas"]
     ticker = state["ticker"]
@@ -83,21 +85,30 @@ async def analysis_node(state: AgentState) -> AgentState:
     logger.info("Ticker: %s, %d personas, financial_info: %d chars, company_profile available",
                  ticker, len(personas), len(financial_info))
 
-    analyses = []
-    for i, persona in enumerate(personas):
-        logger.info("Running persona %d/%d: %s", i + 1, len(personas), persona.name)
+    await emit_status({
+        "type": "status",
+        "node": "analysis",
+        "label": f"Starting {len(personas)} parallel analyses",
+        "message": f"Running {len(personas)} persona analyses simultaneously…",
+    })
+
+    # Create analysis tasks for all personas
+    analysis_tasks = [
+        _run_single_persona_analysis(persona, ticker, financial_info, company_profile)
+        for persona in personas
+    ]
+
+    logger.info("Starting %d parallel persona analysis tasks", len(analysis_tasks))
+
+    # Run all persona analyses in parallel
+    analyses = await asyncio.gather(*analysis_tasks)
+
+    # Emit completion status for each persona
+    for i, analysis in enumerate(analyses):
         await emit_status({
             "type": "status",
             "node": "analysis",
-            "label": f"Analyzing as {persona.name}",
-            "message": f"Running persona {i + 1}/{len(personas)}…",
-        })
-        analysis = await _run_single_persona_analysis(persona, ticker, financial_info, company_profile)
-        analyses.append(analysis)
-        await emit_status({
-            "type": "status",
-            "node": "analysis",
-            "label": f"Completed: {persona.name}",
+            "label": f"Completed: {analysis.persona_name}",
             "message": f"Persona {i + 1}/{len(personas)} analysis done",
         })
 

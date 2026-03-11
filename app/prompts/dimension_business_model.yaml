@@ -1,0 +1,14 @@
+dimension_business_model: |
+  ### Task: Analyze {ticker} and provide ONLY the business model section.
+  ### Context:
+  Only Use the following verifiable, factual information to analyze the company:
+  {financial_info}
+
+  ### Tone: Be concise, analytical, and concrete — no filler or marketing language.
+  ### Constraints: under 100 words.
+  ### Framework:
+  - business_model: Business Model
+  Describe the business model in 100 words. Focus on the core business model and how the company operates.
+
+  ### Output format (JSON) with the following keys:
+  - business_model: Business Model (100 words max)

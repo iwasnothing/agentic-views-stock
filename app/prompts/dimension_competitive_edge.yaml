@@ -1,0 +1,15 @@
+dimension_competitive_edge: |
+  ### Task: Analyze {ticker} and provide ONLY the "Competitive Edge" section.
+  ### Context:
+  Only Use the following verifiable, factual information to analyze the company:
+  {financial_info}
+
+  ### Tone: Be concise, analytical, and concrete — no filler or marketing language.
+  ### Constraints: under 150 words.
+  ### Framework:
+  - competitive_edge: Competitive Edge
+  Explain what protects the company's economics from competition: brand, cost advantage, switching cost, regulation, network effects, data, or IP.
+  Mention how durable and testable this moat appears based on financial evidence (margins, ROIC, retention).
+
+  ### Output format (JSON) with the following keys:
+  - competitive_edge: Competitive Edge (150 words max)

@@ -8,6 +8,8 @@ services:
     command: ["--config", "/app/config.yaml", "--port", "4001"]
     ports:
       - "4001:4001"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     healthcheck:
       test: ["CMD-SHELL", "exit 0"]
       interval: 30s

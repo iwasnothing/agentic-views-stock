@@ -2,19 +2,19 @@ model_list:
   - model_name: qwen-30b
     litellm_params:
       model: openai//models/Qwen/Qwen3-30B-A3B-Instruct-FP8
-      api_base: http://host.docker.internal:8000/v1
+      api_base: http://172.26.0.1:8000/v1
       api_key: sk-dummy-token
 
   - model_name: /qwen-30b
     litellm_params:
       model: openai//models/Qwen/Qwen3-30B-A3B-Instruct-FP8
-      api_base: http://host.docker.internal:8000/v1
+      api_base: http://172.26.0.1:8000/v1
       api_key: sk-dummy-token
 
   - model_name: /models/Qwen/Qwen3-30B-A3B-Instruct-FP8
     litellm_params:
       model: openai//models/Qwen/Qwen3-30B-A3B-Instruct-FP8
-      api_base: http://host.docker.internal:8000/v1
+      api_base: http://172.26.0.1:8000/v1
       api_key: sk-dummy-token
   - model_name: nemotron
     litellm_params:

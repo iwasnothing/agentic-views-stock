@@ -1,0 +1,15 @@
+dimension_revenue_quality: |
+  ### Task: Analyze {ticker} and provide ONLY the "Revenue Quality" section.
+  ### Context:
+  Only Use the following verifiable, factual information to analyze the company:
+  {financial_info}
+
+  ### Tone: Be concise, analytical, and concrete — no filler or marketing language.
+  ### Constraints: under 150 words.
+  ### Framework:
+  - revenue_quality: Revenue Quality
+  Assess how predictable and diversified revenues are.
+  Break down recurring vs one-off components, customer or segment concentration, and exposure to cycles.
+
+  ### Output format (JSON) with the following keys:
+  - revenue_quality: Revenue Quality (150 words max)
