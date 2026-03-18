@@ -1,5 +1,6 @@
 from .models import (
     DecisionRequest,
+    InfographicRequest,
     PersonaPerspective,
     Persona,
     PersonaCollection,
@@ -7,6 +8,11 @@ from .models import (
     CompanyProfile,
     ExecutiveSummary,
     PersonaAnalysis,
+    # Infographic models
+    KeyMetric,
+    RiskBadge,
+    GrowthDriver,
+    InfographicSummary,
     # Dimension models for split processing
     BusinessModelOutput,
     WhatTheySellOutput,
@@ -21,6 +27,7 @@ from .state import AgentState
 
 __all__ = [
     "DecisionRequest",
+    "InfographicRequest",
     "PersonaPerspective",
     "Persona",
     "PersonaCollection",
@@ -29,6 +36,11 @@ __all__ = [
     "ExecutiveSummary",
     "PersonaAnalysis",
     "AgentState",
+    # Infographic models
+    "KeyMetric",
+    "RiskBadge",
+    "GrowthDriver",
+    "InfographicSummary",
     # Dimension models
     "BusinessModelOutput",
     "WhatTheySellOutput",

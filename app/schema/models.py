@@ -6,6 +6,13 @@ class DecisionRequest(BaseModel):
     user_message: str
 
 
+class InfographicRequest(BaseModel):
+    ticker: str
+    company_profile: dict
+    persona_analyses: list[dict]
+    financial_info: str
+
+
 class PlannerOutput(BaseModel):
     """Structured output from the planner: extracted intent and ticker."""
     intent: str = Field(description="The user's intent, e.g. 'stock_analysis', 'comparison', 'general_question'")
@@ -113,3 +120,58 @@ class PersonaAnalysis(BaseModel):
     """Analysis result from a single persona."""
     persona_name: str = Field(description="Name of the persona that produced this analysis")
     executive_summary: ExecutiveSummary = Field(description="Executive summary of how the company makes money, its economic quality, edge, and risks")
+
+
+# Infographic Summary Models
+class KeyMetric(BaseModel):
+    """A key metric with label, value, and trend."""
+    label: str = Field(description="The metric label (e.g., 'P/E Ratio', 'Revenue Growth')")
+    value: str = Field(description="The metric value (e.g., '28.5x', '+15%')")
+    trend: str = Field(description="Trend direction: 'up', 'down', or 'neutral'")
+    context: str = Field(description="Brief context or what this metric means")
+
+
+class RiskBadge(BaseModel):
+    """A risk factor with severity."""
+    factor: str = Field(description="The risk factor name")
+    severity: str = Field(description="Severity level: 'low', 'medium', or 'high'")
+    description: str = Field(description="Brief description of this risk")
+
+
+class GrowthDriver(BaseModel):
+    """A growth driver with impact level."""
+    driver: str = Field(description="The growth driver name")
+    impact: str = Field(description="Impact level: 'low', 'medium', or 'high'")
+    description: str = Field(description="Brief description of this growth driver")
+
+
+class InfographicSummary(BaseModel):
+    """Structured infographic summary for visual display."""
+    ticker: str = Field(description="Stock ticker symbol")
+
+    # Top-level verdict
+    verdict: str = Field(description="Overall investment verdict: Buy, Hold, Sell, or Avoid")
+    verdict_color: str = Field(description="Color code for verdict: 'green', 'yellow', or 'red'")
+    one_liner: str = Field(description="One-line summary of the investment case")
+
+    # Key metrics (3-5)
+    key_metrics: List[KeyMetric] = Field(description="3-5 key financial metrics with trends")
+
+    # Risks (3-4)
+    risks: List[RiskBadge] = Field(description="3-4 key risk factors")
+
+    # Growth drivers (2-3)
+    growth_drivers: List[GrowthDriver] = Field(description="2-3 main growth drivers")
+
+    # Analyst consensus
+    bullish_count: int = Field(description="Number of bullish analysts")
+    bearish_count: int = Field(description="Number of bearish analysts")
+    neutral_count: int = Field(description="Number of neutral analysts")
+
+    # Key stats (2-3)
+    strength_score: int = Field(description="Overall strength score out of 10")
+    moat_score: int = Field(description="Competitive moat score out of 10")
+    valuation_score: int = Field(description="Valuation score out of 10 (10 = undervalued)")
+
+    # Investment thesis bullet points (3)
+    thesis_points: List[str] = Field(description="3 bullet points summarizing the investment thesis")

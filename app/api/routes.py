@@ -6,8 +6,9 @@ import logging
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse, StreamingResponse
 
-from app.schema import DecisionRequest
+from app.schema import DecisionRequest, InfographicRequest, PersonaAnalysis, CompanyProfile
 from app.agents.graph import decision_graph
+from app.agents.infographic_agent import generate_infographic_summary
 from app.config import RECURSION_LIMIT
 from app.events import status_queue_var
 
@@ -145,3 +146,24 @@ async def read_root():
 @router.get("/health")
 async def health():
     return {"status": "healthy"}
+
+
+@router.post("/api/summarize")
+async def summarize_for_infographic(request: InfographicRequest):
+    """Generate an infographic summary from company profile, persona analyses, and financial info."""
+    try:
+        # Convert dict to Pydantic models
+        company_profile = CompanyProfile(**request.company_profile)
+        persona_analyses = [PersonaAnalysis(**pa) for pa in request.persona_analyses]
+
+        summary = await generate_infographic_summary(
+            ticker=request.ticker,
+            company_profile=company_profile,
+            persona_analyses=persona_analyses,
+            financial_info=request.financial_info,
+        )
+
+        return summary.model_dump()
+    except Exception as e:
+        logger.exception("Infographic summary generation failed")
+        raise HTTPException(status_code=500, detail=f"Infographic summary failed: {e}")

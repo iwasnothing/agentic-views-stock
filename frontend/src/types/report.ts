@@ -1,4 +1,43 @@
 export type Recommendation = 'Buy' | 'Hold' | 'Sell' | 'Avoid';
+export type VerdictColor = 'green' | 'yellow' | 'red';
+export type Trend = 'up' | 'down' | 'neutral';
+export type Severity = 'low' | 'medium' | 'high';
+
+export interface KeyMetric {
+  label: string;
+  value: string;
+  trend: Trend;
+  context: string;
+}
+
+export interface RiskBadge {
+  factor: string;
+  severity: Severity;
+  description: string;
+}
+
+export interface GrowthDriver {
+  driver: string;
+  impact: Severity;
+  description: string;
+}
+
+export interface InfographicSummary {
+  ticker: string;
+  verdict: string;
+  verdict_color: VerdictColor;
+  one_liner: string;
+  key_metrics: KeyMetric[];
+  risks: RiskBadge[];
+  growth_drivers: GrowthDriver[];
+  bullish_count: number;
+  bearish_count: number;
+  neutral_count: number;
+  strength_score: number;
+  moat_score: number;
+  valuation_score: number;
+  thesis_points: string[];
+}
 export type Sentiment = 'bullish' | 'bearish' | 'neutral';
 
 export interface ThinkingStep {

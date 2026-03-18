@@ -3,9 +3,9 @@
 import { useState, useRef, useCallback } from 'react';
 import SearchBar from '@/components/SearchBar';
 import ThinkingProcess from '@/components/ThinkingProcess';
-import ReportDashboard from '@/components/ReportDashboard';
+import Infographic from '@/components/Infographic';
 import { parseReport } from '@/lib/parseReport';
-import type { ThinkingStep, ReportData, PersonaAnalysisData, CompanyProfile } from '@/types/report';
+import type { ThinkingStep, ReportData, PersonaAnalysisData, CompanyProfile, InfographicSummary } from '@/types/report';
 
 type AppPhase = 'idle' | 'analyzing' | 'done' | 'error';
 
@@ -22,6 +22,7 @@ export default function Home() {
   const [phase, setPhase] = useState<AppPhase>('idle');
   const [steps, setSteps] = useState<ThinkingStep[]>([]);
   const [reportData, setReportData] = useState<ReportData | null>(null);
+  const [infographicSummary, setInfographicSummary] = useState<InfographicSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isThinkingCollapsed, setIsThinkingCollapsed] = useState(false);
   const [currentTicker, setCurrentTicker] = useState('');
@@ -38,6 +39,7 @@ export default function Home() {
     setPhase('analyzing');
     setSteps([]);
     setReportData(null);
+    setInfographicSummary(null);
     setError(null);
     setIsThinkingCollapsed(false);
     setCurrentTicker(ticker);
@@ -144,6 +146,29 @@ export default function Home() {
               companyProfile,
             );
             setReportData(parsed);
+
+            // Fetch infographic summary after analysis completes
+            if (companyProfile && personaAnalyses && personaAnalyses.length > 0) {
+              try {
+                const infographicResponse = await fetch(`${getApiUrl()}/api/summarize`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    ticker: t || ticker,
+                    company_profile: companyProfile,
+                    persona_analyses: personaAnalyses,
+                    financial_info: financialInfo,
+                  }),
+                });
+                if (infographicResponse.ok) {
+                  const infographicData = await infographicResponse.json();
+                  setInfographicSummary(infographicData);
+                }
+              } catch (e) {
+                console.warn('Failed to fetch infographic summary:', e);
+              }
+            }
+
             setPhase('done');
             setIsThinkingCollapsed(true);
           } else if (data.type === 'error') {
@@ -165,6 +190,29 @@ export default function Home() {
           companyProfile,
         );
         setReportData(parsed);
+
+        // Try fetching infographic summary
+        if (companyProfile && personaAnalyses && personaAnalyses.length > 0) {
+          try {
+            const infographicResponse = await fetch(`${getApiUrl()}/api/summarize`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                ticker: t || ticker,
+                company_profile: companyProfile,
+                persona_analyses: personaAnalyses,
+                financial_info: financialInfo,
+              }),
+            });
+            if (infographicResponse.ok) {
+              const infographicData = await infographicResponse.json();
+              setInfographicSummary(infographicData);
+            }
+          } catch (e) {
+            console.warn('Failed to fetch infographic summary:', e);
+          }
+        }
+
         setPhase('done');
         setIsThinkingCollapsed(true);
       }
@@ -234,8 +282,18 @@ export default function Home() {
               />
             )}
 
-            {/* Report Dashboard */}
-            {reportData && <ReportDashboard data={reportData} />}
+            {/* Report Dashboard - Show infographic instead of wordy dashboard */}
+            {infographicSummary && reportData ? (
+              <Infographic
+                summary={infographicSummary}
+                companyProfile={reportData.companyProfile}
+                analysts={reportData.analysts}
+              />
+            ) : reportData ? (
+              <div className="p-6 text-center text-muted-foreground">
+                Loading infographic...
+              </div>
+            ) : null}
           </div>
         </div>
       )}
